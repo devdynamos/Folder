@@ -1,0 +1,99 @@
+NewTable = SUMMARIZECOLUMNS (
+    "pendingAmount", 
+    SUMX (
+        FILTER ( 'public booking_inventory_financials', 'public booking_inventory_financials'[status] = "pending" ),
+        VALUE('public booking_inventory_financials'[amount])
+    ),
+    "clearedAmount", 
+    SUMX (
+        FILTER ( 'public booking_inventory_financials', 'public booking_inventory_financials'[status] = "approved" ),
+        VALUE('public booking_inventory_financials'[amount])
+    ),
+    "onholdchequecount",
+    COUNTROWS(
+        FILTER (
+            'public booking_inventory_financials',
+            'public booking_inventory_financials'[status] = "pending" &&
+            'public booking_inventory_financials'[cash_flow_status] = "on_hold"
+        )
+    ),
+    "onholdchequeamount",
+    ROUND (
+        SUMX (
+            FILTER ( 'public booking_inventory_financials',
+                LOWER ( 'public booking_inventory_financials'[status] ) = "pending"
+                || LOWER ( 'public booking_inventory_financials'[cash_flow_status] ) = "on_hold"
+            ),
+            VALUE('public booking_inventory_financials'[amount])
+        ),
+        2
+    ),
+    "postdatedchequecount",
+    SUMX (
+        FILTER ( 'public booking_inventory_financials',
+            LOWER ( 'public booking_inventory_financials'[status] ) = "pending"
+            || LOWER ( 'public booking_inventory_financials'[cash_flow_status] ) = "post_dated"
+        ),
+        1
+    ),
+    "returnedchequecount",
+    SUMX (
+        FILTER ( 'public booking_inventory_financials',
+            LOWER ( 'public booking_inventory_financials'[status] ) = "rejected"
+        ),
+        1
+    ),                                                                                                                    "postdatedchequeamount",                                                                                                         ROUND (
+        SUMX (
+            FILTER ( 'public booking_inventory_financials',
+                LOWER ( 'public booking_inventory_financials'[status] ) = "pending"
+                || LOWER ( 'public booking_inventory_financials'[cash_flow_status] ) = "post_dated"
+            ),
+            'public booking_inventory_financials'[amount]
+        ),
+        2
+    ),                                                                                                                        "returnedamount",                                                                                                                     ROUND (
+        SUMX (
+            FILTER ( 'public booking_inventory_financials',
+                LOWER ( 'public booking_inventory_financials'[status] ) = "rejected"
+            ),
+            'public booking_inventory_financials'[amount]
+        ),
+        2
+    ),                                                                                                               "presentedchequecount",                                                                                                               SUMX (
+        FILTER ( 'public booking_inventory_financials',
+            LOWER ( 'public booking_inventory_financials'[status] ) = "in_progress"
+        ),
+        1
+    ),
+    "presentedamount", ROUND (
+        SUMX (
+            FILTER ( 'public booking_inventory_financials',
+                LOWER ( 'public booking_inventory_financials'[status] ) = "in_progress"
+            ),
+            'public booking_inventory_financials'[amount]
+        ),
+        2
+    ),
+    "cancelledchequecount", SUMX (
+    FILTER ( 'public booking_inventory_financials',
+        LOWER ( 'public booking_inventory_financials'[status] ) = "rejected"
+    ),
+    1
+),
+"cancelledamount", ROUND (
+    SUMX (
+        FILTER ( 'public booking_inventory_financials',
+            LOWER ( 'public booking_inventory_financials'[status] ) = "rejected"
+        ),
+        'public booking_inventory_financials'[amount]
+    ),
+    2
+),
+
+    "tobepresentedchequecount", SUMX (
+        FILTER ( 'public booking_inventory_financials',
+            LOWER ( 'public booking_inventory_financials'[status] ) = "pending"
+        ),
+        1
+    )
+)

@@ -1,0 +1,152 @@
+// src/App.js
+import React from 'react';
+// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './App.css';
+import Login from './login';
+// import Dashboard from './dashboard'; // Import the new page component
+
+function App() {
+  return (
+    <div className="App">
+      <Login/>
+  
+   {/* <Router> */}
+      
+        {/* <Routes> */}
+          {/* <Route path="/" exact component={Login} /> */}
+          {/* <Route path="/dashboard" component={Dashboard} /> */}
+        {/* </Routes> */}
+      
+    {/* </Router> */}
+    </div>
+ );
+}
+
+export default App;                                                                                                                                                                               // src/Login.js
+import React, { useState } from 'react';
+import './login.css';
+import Register from './register'; // Import the Register component
+
+
+function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showRegister, setShowRegister] = useState(false); // To toggle between the login and registration forms
+  const [loginMessage, setLoginMessage] = useState('');
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+ const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleLogin = () => {
+    const storedPassword = localStorage.getItem(username);
+
+    if (!storedPassword) {
+      setLoginMessage('You don\'t have an account. Register your account first.');
+    } else if (storedPassword === password) {
+      setLoginMessage('Login successful');
+      // Navigate to the new page after successful login
+    } else {
+      setLoginMessage('Login failed. Please check your username and password.');
+    }
+  };
+
+  const handleCreateAccountToggle = () => {
+    // Toggle the state to show/hide the registration form
+    setShowRegister(!showRegister);
+  };
+
+  const handleBackToLogin = () => {
+    setShowRegister(false); // Hide the registration form
+    setLoginMessage(''); // Clear any login messages
+  };
+
+  return (
+    <div className="login-container">
+      <h2>{showRegister ? 'Register' : 'Login'}</h2>
+      {showRegister ? (
+        <Register onBackToLogin={handleBackToLogin} />
+      ) : (
+        <>
+          <div className="form-group">
+            <label>Username:</label>
+            <input type="text" value={username} onChange={handleUsernameChange} />
+          </div>
+          <div className="form-group">
+            <label>Password:</label>
+<input type="password" value={password} onChange={handlePasswordChange} />
+          </div>
+          <div className="button-container">
+            <button onClick={handleLogin}>Login</button>
+            <button1 onClick={handleCreateAccountToggle}> <span style={{ whiteSpace: 'nowrap' }}>Create New Account</span></button1>
+          </div>
+          <div className="login-message">{loginMessage}</div>
+          {}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default Login;
+// src/Register.js
+import React, { useState } from 'react';
+import './register.css';
+function Register({ onBackToLogin }) {
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [registrationMessage, setRegistrationMessage] = useState('');
+
+  const handleUsernameChange = (e) => {
+    setNewUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setNewPassword(e.target.value);
+  };
+
+  const handleRegistration = (e) => {
+    e.preventDefault();
+
+    // Check if the username already exists in localStorage
+    if (localStorage.getItem(newUsername)) {
+      setRegistrationMessage('Username already exists. Please choose a different username.');
+    } else {
+// Store the new user's credentials in localStorage
+      localStorage.setItem(newUsername, newPassword);
+
+      // Provide feedback to the user
+      setRegistrationMessage('Registration successful. You can now log in with your new account.');
+
+      // Clear the form fields
+      setNewUsername('');
+      setNewPassword('');
+    }
+  };
+
+  return (
+    <div className="registration-container">
+      <form onSubmit={handleRegistration}>
+        <div className="form-group">
+<label>Username:</label>
+          <input type="text" value={newUsername} onChange={handleUsernameChange} />
+        </div>
+        <div className="form-group">
+          <label>Password:</label>
+          <input type="password" value={newPassword} onChange={handlePasswordChange} />
+        </div>
+        <div className="button-container">
+        <button type="submit">Register</button>
+        {/* Add a "Back to Login" button or link */}
+        <button1 type="button" onClick={onBackToLogin}>Back to Login</button1>
+        </div>
+      </form>
+      <div className="registration-message">{registrationMessage}</div>
+    </div>
+  );
+}
+
+export default Register;

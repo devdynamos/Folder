@@ -1,0 +1,64 @@
+fractional sa advisor_id aur capstone_advisor_id ma jo jo agents k bookings us ma hoe ve hai un ka data table ma display krwana  
+SELECT
+    a.id AS agent_id,
+    a.cnic,
+    a.contact_no,
+    a.first_name,
+    CASE
+        WHEN bifu.advisor_id = a.id THEN bifu.advisor_id
+        WHEN bifu.capstone_advisor_id = a.id THEN bifu.capstone_advisor_id::bigint
+        ELSE NULL
+    END AS common_id,
+    bifu.cust_demand_sq_ft,
+    bifu.booking_date,
+    bifu.created_at,
+    bifu.in_rate_per_sq_ft,
+    bifu.status AS booking_status,
+    bifu.discount,
+    a_capstone_advisor.first_name AS capstone_advisor_first_name,
+    a_capstone_advisor.last_name AS capstone_advisor_last_name,
+    a_advisor.first_name AS advisor_first_name,
+    a_advisor.last_name AS advisor_last_name,
+    a_agent.first_name AS agent_first_name,
+    a_agent.last_name AS agent_last_name
+FROM
+    agents a
+LEFT JOIN
+    booking_inventory_fractional_units bifu ON a.id = bifu.advisor_id OR a.id = bifu.capstone_advisor_id
+LEFT JOIN
+    agents a_capstone_advisor ON a_capstone_advisor.id = bifu.capstone_advisor_id
+LEFT JOIN
+    agents a_advisor ON a_advisor.id = bifu.advisor_id
+LEFT JOIN
+    agents a_agent ON a_agent.id = bifu.agent_id;
+
+
+Table2 = 
+ADDCOLUMNS (
+    CROSSJOIN (
+        'public agents',                                                                                                                     VALUES('public agents'[id]),
+        VALUES('public booking_inventory_fractional_units'[advisor_id]),                                                                                                                   VALUES('public booking_inventory_fractional_units'[capstone_advisor_id])
+    ),
+    "advisor_id2",
+    IF (
+        'public agents'[id] = 'public booking_inventory_fractional_units'[advisor_id],
+        'public booking_inventory_fractional_units'[advisor_id],
+        IF (
+            'public agents'[id] = 'public booking_inventory_fractional_units'[capstone_advisor_id],
+            'public booking_inventory_fractional_units'[capstone_advisor_id],
+            BLANK ()
+        )
+    ),
+    "name",'public agents'[first_name]
+)
+
+
+
+
+datatypes kya hai aur kis trah k value hai ......
+
+
+
+
+
+flux boxex
